@@ -10,13 +10,14 @@ and also be able to define own function.
 ## examples:
 
 * see hello to world.  :-)
-
+    ```
     main { 
         print("Hello World!");
     }
+    ```
 
 * simple logic/math calculation
-    
+    ```
     main {
         i = 9;
         while(i > 0) {
@@ -26,9 +27,11 @@ and also be able to define own function.
             i = i - 1;
         }
     }
+    ```
 
 * Array
-## array test
+    ```
+    ## array test
     main {
         a = [99, "string", 88];
 
@@ -38,10 +41,11 @@ and also be able to define own function.
         a[1] = "ss";
         print (a); ## output: [99,ss,88,]
     }
+    ```
 
 * Oh, Fibonacci! haha
 
-
+    ```
     def fibonacci (n) {
         if (n == 0 or n == 1) {
             return n;
@@ -52,7 +56,7 @@ and also be able to define own function.
     main {
         print("fibonacci(30):", fn(30));
     }
-
+    ```
 
 ## why do I make *minlang*. 
 
