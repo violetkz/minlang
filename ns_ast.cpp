@@ -3,6 +3,7 @@
 #include <cstring>
 #include <map>
 #include <string>
+#include <vector>
 #include <iostream>
 #include <iterator>
 #include "ns_ast.h"
@@ -50,11 +51,12 @@ ns_value rule_list_node::eval(ns_rt_context *rtctx) {
 
 ns_value exp_list_node::eval(ns_rt_context *rtctx) {
 
+    ns_value n(NSVAL_LIST);
     nl_iter it = begin();
     for (;it != end(); ++it) {
-        (*it)->eval(rtctx);
+        n.append((*it)->eval(rtctx));
     }
-    return ns_value(NSVAL_STATUS, NSVAL_STATUS_OK);
+    return n;
 }
 
 ns_value assign_node::eval(ns_rt_context *rtctx) {
@@ -68,7 +70,7 @@ ns_value assign_array_elem_node::eval(ns_rt_context *rtctx) {
     if (pv.is_iteratale()) {
         ns_value idx = index->eval(rtctx);        
         if (idx.is_int()) {
-            set_elem(pv, idx.int_val, rvalue->eval(rtctx));  
+            pv.set_elem(idx.int_val, rvalue->eval(rtctx));  
         }
         return pv;
     }
@@ -78,7 +80,7 @@ ns_value assign_array_elem_node::eval(ns_rt_context *rtctx) {
 ns_value builtin_func_node::eval(ns_rt_context *rtctx) {
 
     // eval paramter list
-    std::list<ns_value> func_param_value_list;
+    std::vector<ns_value> func_param_value_list;
     exp_list_node::nl_iter it = plist->begin();
     for(; it != plist->end(); ++it) {
         func_param_value_list.push_back((*it)->eval(rtctx));
@@ -87,7 +89,7 @@ ns_value builtin_func_node::eval(ns_rt_context *rtctx) {
     if (strcmp(func_name, "print") == 0) {
 
         std::copy(func_param_value_list.begin(), func_param_value_list.end(), 
-                  std::ostream_iterator<ns_value> (std::cout));
+                std::ostream_iterator<ns_value> (std::cout));
         std::cout << std::endl;
     }
     else{
@@ -219,9 +221,9 @@ ns_value stmt_list_node::eval(ns_rt_context *rtctx) {
         node *n = *it;
         ns_value val = n->eval(rtctx);
         if (val.is_status_break() 
-            || val.is_status_continue()
-            || val.is_status_return()
-            || val.is_illegal_value()) {
+                || val.is_status_continue()
+                || val.is_status_return()
+                || val.is_illegal_value()) {
             return val;
         }
     }
@@ -230,6 +232,13 @@ ns_value stmt_list_node::eval(ns_rt_context *rtctx) {
 
 
 ns_value array_def_node::eval(ns_rt_context *rtctx) {
+
+    ns_value v = elements->eval(rtctx);
+    if (v.is_array()) {
+        return v;
+    }
+
+#if 0
     exp_list_node::nl_iter it = elements->begin();
     ns_value v_list(NSVAL_LIST);
     for (; it != elements->end(); ++it) {
@@ -238,7 +247,8 @@ ns_value array_def_node::eval(ns_rt_context *rtctx) {
             v_list.list_val->push_back(v);
         }
     }
-    return v_list;
+#endif
+    return ns_value(NSVAL_ILLEGAL);
 }
 
 ns_value array_ref_node::eval(ns_rt_context *rtctx) {
@@ -246,23 +256,23 @@ ns_value array_ref_node::eval(ns_rt_context *rtctx) {
     if (pv.is_iteratale()) {
         ns_value idx = index->eval(rtctx);        
         if (idx.is_int()) {
-            return get_elem(pv, idx.int_val);            
+            return pv.get_elem(idx.int_val);            
         }
         std::cerr 
             << "index is not integer type." << std::endl;
     }
     std::cerr
-            << "the object is not iteratable" << std::endl;
+        << "the object is not iteratable" << std::endl;
 
     return ns_value(NSVAL_ILLEGAL);
 }
 
 def_func_node::def_func_node(char *name, identifier_list_node *args, node *stmts)
     :node(DEF_FUNC_NODE), func_name(name), arg_list(args), stmt_list(stmts) {
-}
+    }
 
 ns_value def_func_node::eval(ns_rt_context *rtctx) {
-    
+
     // push paramter stack
     if (rtctx->func_param_list->size() == arg_list->size()) {
         auto it = arg_list->begin();
@@ -288,4 +298,55 @@ ns_value stmt_return_node::eval(ns_rt_context *rtctx) {
         rtctx->func_return_val = retval_exp->eval(rtctx); 
     }
     return retval;
+}
+
+ns_value dot_call_method_node::eval(ns_rt_context *rtctx) {
+    ns_value arr = postfix->eval(rtctx);
+
+    // eval paramter list
+    ns_value arglist = args->eval(rtctx);
+    std::vector<ns_value> *plist = arglist.list_val;
+
+    if (arr.is_array() && arglist.is_array()) {
+        if (strcmp(name, "append") == 0) {
+            if (arglist.len() == 1) {
+                arr.append((*plist)[0]);
+                return arr;
+            }
+        }
+        else if (strcmp(name, "len") == 0) {
+            return ns_value(arr.len()); 
+        }
+        else if (strcmp(name, "del") == 0) {
+            if (arglist.len() == 1) {
+                ns_value arg = (*plist)[0];
+                if (arg.is_int()) {
+                    arr.del(arg.int_val);
+                }
+                else {
+                    std::cerr << "paramter isn't type int!" << std::endl;
+                }
+            }
+            else {
+                std::cerr << "Bad paramter number!" << std::endl;
+            }
+            return arr;
+        }
+        else if (strcmp(name, "find") == 0) {
+            if (arglist.len() == 1) {
+                int idx = arr.find((*plist)[0]);
+                if (idx == -1) {
+                    std::cerr << "out of index. " << std::endl;
+                    return ns_value(NSVAL_ILLEGAL);
+                }
+                return ns_value(idx);
+            }
+        }
+        else {
+            std::cerr << "func: " << name << "doesn't support." << std::endl;
+            return ns_value(NSVAL_ILLEGAL);
+        }
+    }
+
+    return ns_value(NSVAL_ILLEGAL);
 }

@@ -168,18 +168,18 @@ public:
 
 class dot_call_method_node : public node {
 public:
-    dot_call_method_node(node *pexp, char *func_name, node *arglist)
+    dot_call_method_node(node *pexp, char *func_name, exp_list_node *arglist)
         : node(DOT_CALL_METHOD_NODE), 
         postfix(pexp),
         name(func_name),
         args(arglist) {
      }
-    ns_value eval(ns_rt_context *rtctx = NULL) {return ns_value(NSVAL_STATUS, NSVAL_STATUS_OK);}
+    ns_value eval(ns_rt_context *rtctx = NULL);
 public:
     node    *postfix;
     //symbol  *name;
     char    *name;
-    node    *args;
+    exp_list_node *args;
 };
 
 class rule_node : public node {

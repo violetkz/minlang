@@ -1,0 +1,17 @@
+## array test
+main {
+    
+    i = 0; 
+    a = [1,2];
+    while ( i < 99 ) {
+        a.append(i); i = i + 1;
+    }
+    
+    print(a);
+    print("the length of a:", a.len());
+
+    print("99's index:", a.find(99));
+    
+    a.del(101);
+    print(a);
+}

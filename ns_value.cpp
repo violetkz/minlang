@@ -33,7 +33,7 @@ ns_value::ns_value(ns_value_type t) : type(t), int_val(0), ref_count(0) {
             bool_val = false;
             break;
         case NSVAL_LIST:
-            list_val = new std::list<ns_value>;
+            list_val = new std::vector<ns_value>;
             ref_count = new int(1);
             break;
         default:
@@ -129,8 +129,7 @@ ns_value &ns_value::operator = (const ns_value &s) {
     else if (type == NSVAL_LIST)     list_val = s.list_val;
     else if (type == NSVAL_EXPERESS_AST) node_val = s.node_val;
     else {
-        std::cerr << "Warning! the constractor can't handle un-defined type" 
-                << std::endl;
+        std::cerr << "Warning! the constractor can't handle un-defined type. " << type  << std::endl;
         int_val = 0;
     }
     return *this;
@@ -317,28 +316,59 @@ bool operator >= (const ns_value &l, const ns_value &r) {
 }
 
 
-ns_value get_elem(const ns_value &n, unsigned int index) {
-    if (n.type ==  NSVAL_LIST) {
-        std::list<ns_value>::iterator it = n.list_val->begin();
-        int i = 0;
-        for (i = 0; i<index && it != n.list_val->end(); ++it, ++i) {
-        }
-        if (i == index && it != n.list_val->end())
-            return *it;
+ns_value ns_value::get_elem(unsigned int index) {
+    if (is_array() && list_val != NULL) {
+        if (list_val->size() > index)
+            return list_val->at(index);
+        else
+            std::cerr << "Bad index of array!" << std::endl;
     }
 
     return ns_value(NSVAL_ILLEGAL);
 }
 
-const ns_value& set_elem(const ns_value &n, unsigned int index, const ns_value& v) {
-    
-    if (n.type ==  NSVAL_LIST) {
-        std::list<ns_value>::iterator it = n.list_val->begin();
-        int i = 0;
-        for (i = 0; i<index && it != n.list_val->end(); ++it, ++i) {
-        }
-        if (i == index && it != n.list_val->end())
-            *it = v;
+void ns_value::set_elem(unsigned int index, const ns_value& v) {
+
+    if (is_array() && list_val != NULL) {
+        if (list_val->size() > index)
+            (*list_val)[index] = v;
+        else 
+            std::cerr << "Bad index of array!" << std::endl;
     }
-    return n;
 }
+
+void    ns_value::append(const ns_value &v) {
+    if (is_array() && list_val != NULL) {
+        list_val->push_back(v); 
+    }
+}
+int  ns_value::len() {
+    int len = 0;
+    if (is_array() && list_val != NULL) {
+        len = list_val->size();
+    }
+    return len;
+}
+
+void  ns_value::del(size_t idx) {
+    if (is_array() && list_val != NULL) {
+        list_val->erase(list_val->begin() + idx);
+    }
+}
+
+int  ns_value::find(const ns_value &v) {
+    
+    int idx = -1;
+    if (is_array() && list_val != NULL) {
+        array_iter it = std::find(list_val->begin(),
+                list_val->end(),
+                v);
+        
+        if (it != list_val->end()){
+            idx = it - list_val->begin();
+        }
+    }
+    return idx;
+}
+
+

@@ -191,7 +191,7 @@ dot_call_method_exp:
     ;
     
 
-exp_list: /* empty */ {$$ = NULL;}
+exp_list: {$$ = new exp_list_node;}
     | exp             
                     { 
                     $$ = new exp_list_node;
@@ -199,6 +199,7 @@ exp_list: /* empty */ {$$ = NULL;}
                     }
     | exp_list ',' exp 
                     { 
+
                     $$  = $1;
                     if ($$ == NULL) {
                         $$ = new exp_list_node;

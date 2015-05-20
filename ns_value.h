@@ -2,7 +2,7 @@
 #define ns_value_h___
 
 #include <iostream>
-#include <list>
+#include <vector>
 
 
 enum ns_value_type {
@@ -36,9 +36,10 @@ public:
         bool                    bool_val;   /* value for boolean */
         std::string             *chr_val;   /* value for string  */
         node                    *node_val;  /* runnable expression */
-        std::list<ns_value>     *list_val;  /* value for array    */
+        std::vector<ns_value>   *list_val;  /* value for array    */
     };
 
+    typedef std::vector<ns_value>::iterator array_iter;
 public: 
     ns_value():type(NSVAL_UNINITIALIZED), int_val(0), ref_count(0) {}
     ns_value(const ns_value& n);
@@ -64,6 +65,10 @@ public:
     inline bool is_illegal_value() const { 
         return (type == NSVAL_ILLEGAL);
     }
+    
+    inline bool is_array() const {
+        return type == NSVAL_LIST;
+    }
 
     inline bool is_iteratale() const { 
         return (type == NSVAL_LITERAL_STR || type == NSVAL_LIST); 
@@ -86,6 +91,14 @@ public:
                 || (type != NSVAL_ILLEGAL) 
                 || (type != NSVAL_UNINITIALIZED);
     }
+
+    /* some builtin func for array type */
+    ns_value get_elem(unsigned int index);
+    void     set_elem(unsigned int index, const ns_value &v);
+    void    append(const ns_value &v);
+    int  len();
+    void    del(size_t idx);
+    int    find(const ns_value &v);
 
 private:
     inline void add_ref(); 
@@ -112,6 +125,4 @@ bool operator <= (const ns_value &l, const ns_value &r);
 bool operator >= (const ns_value &l, const ns_value &r);
 
 
-ns_value get_elem(const ns_value &n, unsigned int index);
-const ns_value& set_elem(const ns_value &n, unsigned int index, const ns_value &v);
 #endif  //~ns_value_h___
