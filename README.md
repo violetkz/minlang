@@ -43,6 +43,22 @@ and also be able to define own function.
     }
     ```
 
+    anthoer one:
+    ```
+    main {
+        a = [];
+        i = 0;
+        while (i < 99) {
+            a.append(i);
+        }
+
+        print("the length of array a:", a.len());
+        
+        re = a.find(99);
+        print("the index of 99 in the array a:", re);
+    }
+    ```
+
 * Oh, Fibonacci! haha
 
     ```
