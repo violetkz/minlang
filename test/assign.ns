@@ -1,0 +1,33 @@
+main { 
+    ## comment test
+    ## comment test
+    ## comment test
+    ## comment test
+    ## comment test
+    d = 2222;
+    a = b = d;
+    #b = 999*999;
+
+    sxx = r"eww";
+    s2  = "world";
+    str = "hello"; #test ------
+    
+    ss = "";
+    x = s2 + str + s2 + "world";
+    if (x) {
+        print(x);
+    }
+    
+    if (99 == 99) {
+        print ("compare eq");
+    }
+    
+    if ("ss999" > "ss") {
+        print ("compare >");
+    }
+    
+    if (90 + 100 < 200) {
+        print("int <");
+    }
+    print(a,b,d);
+}

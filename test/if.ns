@@ -1,0 +1,22 @@
+#!./ns -f 
+main {
+    print ("#############");
+    if ((99 + 99) > 100) {
+        print ("com >");
+    }
+    x = "ss";
+    if (x) { print ("str cmp"); }
+
+    if (99 + 99 > 100 and x) {
+        print ("and test ok");
+        if ( 99 - 0 < 0 or x ) {
+            print ("cmp or test"); 
+        } 
+        else {
+            print ("else test"); 
+        }
+    }
+    x = ["x", x, 999];
+    
+    print (x);
+}

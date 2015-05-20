@@ -1,0 +1,16 @@
+main {
+    i = 9;
+    while(i > 0) {
+        i = i - 1;
+        if ( i % 2 == 0) {
+            print (i);
+        }
+        if (i == 7) {
+            continue;
+        }
+        if (i == 6) {
+            break;
+        }
+        print ("->", i);
+    }
+}

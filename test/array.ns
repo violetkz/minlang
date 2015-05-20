@@ -1,0 +1,12 @@
+## array test
+main {
+    a = [99, 100, 88];
+    x = a[1] + 1;
+    print(x);
+
+    a[1] = "ss";
+    print (a);
+    
+    a = ([99,90][1] = "TEST");
+    print (a);
+}
