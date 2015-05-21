@@ -62,11 +62,10 @@ public:
     ns_value set_value(ns_rt_context *rtctx, ns_value v);
     ns_value eval(ns_rt_context *rtctx = NULL);
 public:
-    //symbol *sym;
     std::string id;
 };
 
-/* string node */
+/* integer node */
 class int_node : public node {
 public:
     int_node(int n) : node(NUM_INT_NODE), i(n) {
@@ -88,6 +87,7 @@ public:
     char *str;
 };
 
+/* regex node */
 class regex_str_node : public node {
 public:
     regex_str_node(char *str)
@@ -98,6 +98,7 @@ public:
     char *regex_str;
 };
 
+/* base list node */
 template<typename T, int NS_NODE_TYPE> 
 class node_list : public node 
 {
@@ -113,8 +114,10 @@ private:
     std::list<T*> nlist;
 };
 
+/* identifier list */
 typedef std::list<const char *> identifier_list_node;
 
+/* expression list */
 typedef node_list<node, node::EXPLIST_NODE> explist_base;
 class exp_list_node : public  explist_base {
 public:
@@ -122,6 +125,7 @@ public:
     ns_value eval(ns_rt_context *rtctx = NULL);
 };
 
+/* function definition node */
 class def_func_node : public node {
 public:
     def_func_node(char *name, identifier_list_node *args, node *stmts);
@@ -132,6 +136,7 @@ public:
     identifier_list_node *arg_list;
 };
 
+/* array definition node */
 class array_def_node : public node {
 public:
     array_def_node(exp_list_node* elems)
@@ -142,6 +147,7 @@ public:
     exp_list_node *elements;
 };
 
+/*  array reference node */
 class array_ref_node : public node {
 public:
     array_ref_node(node *pexp, node *idx_exp)
@@ -153,6 +159,7 @@ public:
     node *index;
 };
 
+/* assign value to array */
 class assign_array_elem_node : public node {
 public:
     assign_array_elem_node(node *p, node *idx, node *v) 
@@ -166,6 +173,7 @@ public:
     node *rvalue;
 };
 
+/* the node of calling method */
 class dot_call_method_node : public node {
 public:
     dot_call_method_node(node *pexp, char *func_name, exp_list_node *arglist)
@@ -177,33 +185,9 @@ public:
     ns_value eval(ns_rt_context *rtctx = NULL);
 public:
     node    *postfix;
-    //symbol  *name;
     char    *name;
     exp_list_node *args;
 };
-
-class rule_node : public node {
-public:
-    rule_node(node *p, node *act) 
-            :node(RULE_NODE),
-            pattern(p), 
-            action(act) {
-        /* do nothing */
-    }
-    ns_value eval(ns_rt_context *rtctx = NULL); 
-
-public:
-    node *pattern;
-    node *action;
-};
-
-typedef node_list<rule_node, node::RULE_LIST_NODE> rule_list_base;
-class rule_list_node : public rule_list_base {
-public:
-    rule_list_node() : rule_list_base() {}
-    ns_value eval(ns_rt_context *rtctx = NULL);
-};
-
 
 typedef node_list<node, node::STMT_LIST_NODE> stmt_list_base;
 class stmt_list_node : public stmt_list_base {

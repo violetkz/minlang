@@ -22,7 +22,7 @@ ns_value variable_node::set_value(ns_rt_context *rtctx, ns_value v) {
 
 ns_value variable_node::eval(ns_rt_context *rtctx) {
     symbol *sym = check_symbol(id, rtctx);
-    if (!sym) { //xxx
+    if (!sym) {
     }
     return sym->value;
 }
@@ -33,20 +33,6 @@ ns_value int_node::eval(ns_rt_context *rtctx) {
 
 ns_value str_node::eval(ns_rt_context *rtctx) {
     return ns_value(str); 
-}
-
-ns_value rule_node::eval(ns_rt_context *rtctx) {
-    pattern->eval(rtctx);
-    action->eval(rtctx);
-    return ns_value(NSVAL_STATUS, NSVAL_STATUS_OK);
-}
-
-ns_value rule_list_node::eval(ns_rt_context *rtctx) {
-    nl_iter it = begin();
-    for (;it != end(); ++it) {
-        (*it)->eval(rtctx);
-    }
-    return ns_value(NSVAL_STATUS, NSVAL_STATUS_OK);
 }
 
 ns_value exp_list_node::eval(ns_rt_context *rtctx) {
@@ -99,11 +85,11 @@ ns_value builtin_func_node::eval(ns_rt_context *rtctx) {
             if (ns.type == NSVAL_EXPERESS_AST) {
                 node *func = ns.node_val;
                 if (func) {
-                    //create a func run time environment.
+                    // create a func run time environment.
                     ns_rt_context func_rt_ctx;  
-                    //pass the paramter list
+                    // pass the paramter list
                     func_rt_ctx.func_param_list = &func_param_value_list;
-                    //eval the func node under local env;
+                    // eval the func node under local env;
                     ns_value func_status = func->eval(&func_rt_ctx);
                     if (func_status.is_status_return()) {
                         return func_rt_ctx.func_return_val; 
@@ -148,7 +134,6 @@ ns_value stmt_while_node::eval(ns_rt_context *rtctx) {
 }
 
 ns_value stmt_for_in_node::eval(ns_rt_context *rtctx) {
-    // TODO  
     return ns_value(NSVAL_STATUS, NSVAL_STATUS_OK);
 }
 
@@ -238,16 +223,6 @@ ns_value array_def_node::eval(ns_rt_context *rtctx) {
         return v;
     }
 
-#if 0
-    exp_list_node::nl_iter it = elements->begin();
-    ns_value v_list(NSVAL_LIST);
-    for (; it != elements->end(); ++it) {
-        ns_value v = (*it)->eval(rtctx);     
-        if (! v.is_illegal_value()) {
-            v_list.list_val->push_back(v);
-        }
-    }
-#endif
     return ns_value(NSVAL_ILLEGAL);
 }
 

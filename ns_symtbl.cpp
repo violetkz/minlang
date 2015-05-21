@@ -16,16 +16,11 @@ private:
 
 symtbl *ns_symtbl::tbl = NULL;
 
-/* update a symbol with a specified value */
-symbol *update_symbol(const std::string &name, const ns_value &value, ns_rt_context *rt) {
-    // TODO
-    return NULL;
-}
 /* install a symbol into table */
 symbol *check_symbol(const std::string& name, ns_rt_context *rt) {
 
     symtbl *tbl = NULL;
-    
+
     if (rt) {
         tbl = &rt->local_env;
     }
@@ -48,7 +43,8 @@ symbol *check_symbol(const std::string& name, ns_rt_context *rt) {
     return n;
 }
 
-/* find a symbol from table by name and return pointer of symbol if existed
+/* 
+ * find a symbol from table by name and return pointer of symbol if existed
  * esle return NULL 
  */ 
 symbol *find_symbol(const std::string& name, ns_rt_context *rt) {
@@ -62,7 +58,7 @@ symbol *find_symbol(const std::string& name, ns_rt_context *rt) {
             return re;
         }
     }
-    
+
     /* search global symbol tablel. */
     symtbl *tbl = ns_symtbl::get_tbl();
     symtbl_iterator it = tbl->find(name);

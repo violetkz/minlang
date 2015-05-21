@@ -9,8 +9,7 @@ const int ns_value::need_ref_count_bit_map =
         | (1 << NSVAL_LIST);
 
 bool ns_value::is_ref_count_type(ns_value_type t) {
-   bool v = (need_ref_count_bit_map & (1 << t)) ? true : false;
-   return v;
+   return need_ref_count_bit_map & (1 << t);
 }
 
 ns_value::ns_value(ns_value_type t) : type(t), int_val(0), ref_count(0) {
@@ -205,7 +204,6 @@ ns_value operator+ (const ns_value &l, const ns_value &r) {
             return ns_value(l.int_val + r.int_val);
         }
         else if (l.type == NSVAL_LITERAL_STR) {
-            //XXX
             std::string tmp = *l.chr_val + *r.chr_val;
             return  ns_value(tmp.c_str());
         }
