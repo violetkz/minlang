@@ -41,20 +41,17 @@ void yyerror(const char *fmt, ...);
 %token <fn>     BUILTIN_FUNC
 %token <intval> NUM_INT
 
-%type <ast>  pattern stmt exp binary_operator_exp binary_compare_exp primary_exp 
-             array_ref return_exp 
+%type <ast>  stmt exp binary_operator_exp binary_compare_exp primary_exp 
+             array_ref 
 %type <ast_func>    func_exp  
 %type <ast_def_func> def_func_exp 
 %type <ast_assign>  assign_exp 
 %type <ast_explist> exp_list
-%type <ast_rules>   rule_list
-%type <ast_rule>    rule
 %type <ast_stmt_list>  stmt_list
 %type <ast_identifier_list> identifier_list
 %type <ast_dot_call_method> dot_call_method_exp
 %type <ast_assign_array_elem> assign_array_elem_exp
 %type <ast_variable> variable
-%type <ast_return_node>  stmt_return_exp
 
 
 /* Lowest to highest */
@@ -69,19 +66,6 @@ void yyerror(const char *fmt, ...);
 start: program
      ;
 
-/*
-start: rule_list { if ($1 != NULL) {
-                    $1->eval();
-                    }
-                 }
-    | MAIN '{' stmt_list '}'
-                { 
-                if ($3 != NULL) $3->eval();
-                }
-
-    ;
-*/
-
 program: def_func_list main
     ;
 
@@ -91,25 +75,6 @@ main: MAIN '{' stmt_list '}' { if ($3 != NULL) $3->eval(); }
 def_func_list:  /* empty */
     | def_func_list def_func_exp 
  
-
-rule_list: /* empty */ { $$ = NULL; } 
-    | rule_list rule   { 
-                            $$ = $1;
-                            if ($$ == NULL) {
-                                $$ = new rule_list_node;
-                            }
-                            $$->append($2);
-                       }
-    ;
-    
-rule: pattern '{' stmt_list '}' { $$ = new rule_node($1, $3); }
-    ;
-
-pattern: /* empty */ {$$ = NULL;}
-    | REGEXSTR  { $$ = new regex_str_node($1);}
-    | STR       { $$ = new str_node($1);}
-    ;
-
 
 stmt:    FOR variable IN variable '{' stmt_list '}'  
                 { $$ = new stmt_for_in_node($2, $4, $6); }
@@ -122,6 +87,8 @@ stmt:    FOR variable IN variable '{' stmt_list '}'
         | exp ';'           { $$ = $1; }
         | BREAK ';'     { $$ = new stmt_break_node; }
         | CONTINUE ';'  { $$ = new stmt_continue_node; }
+        | RETURN exp ';' { $$ = new stmt_return_node($2); }
+        | RETURN ';'    {$$ = new stmt_return_node(NULL); }
         ;
 
 stmt_list: /* empty */    { $$ = NULL; }
@@ -143,7 +110,6 @@ exp: binary_operator_exp
    | assign_array_elem_exp {$$ = $1;}
    | array_ref  {$$ = $1;}       
    | dot_call_method_exp {$$=$1;}
-   | stmt_return_exp { $$ = $1; }
    ;
 
 /* +, -, *, /, operator */
@@ -230,7 +196,6 @@ identifier_list:  /* empty */ { $$ = NULL; }
     | IDENTIFIER           
       {
         $$ = new identifier_list_node;
-        //$$->append($1)
         $$->push_back($1);
       }
 
@@ -240,7 +205,6 @@ identifier_list:  /* empty */ { $$ = NULL; }
         if ($$ == NULL) {
             $$ = new identifier_list_node;
         }
-        //$$->append($3);
         $$->push_back($3);
       }
     ;
@@ -252,13 +216,6 @@ assign_exp: variable '=' exp
 assign_array_elem_exp: primary_exp '[' exp ']' '=' exp     
     { $$ = new assign_array_elem_node($1,$3,$6); }
     ;
-
-return_exp: /* empty */ { $$ = NULL; }
-          | exp         { $$ = $1;   }
-          ;
-
-stmt_return_exp: RETURN return_exp { $$ = new stmt_return_node($2); }
-               ;
 
 %%
 

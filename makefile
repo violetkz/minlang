@@ -1,5 +1,5 @@
 CPPFLAGS=-g -std=gnu++11 
-CPP=g++
+CC=g++
 
 all: ns
 
