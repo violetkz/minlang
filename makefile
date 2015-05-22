@@ -45,4 +45,5 @@ ut_nodelist.o: ut_nodelist.cpp
 
 clean:
 	rm -rf *.o *.exe  *.out *.dSYM ns lextest ns.tab.c ns.tab.cpp ns.tab.h ns_lex.c ns_lex.cpp *.stackdump ut_value ut_nodelist 
+	rm -rf log
 
