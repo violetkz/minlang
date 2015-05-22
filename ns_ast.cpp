@@ -14,16 +14,17 @@
 #include <cassert>
 #include <cstdio>
 #include <cstring>
+
 #include <map>
 #include <string>
 #include <vector>
 #include <iostream>
 #include <iterator>
+
 #include "ns_ast.h"
 #include "ns_symtbl.h"
 #include "ns.tab.h"
-
-extern void free_strval(char*);
+#include "ns_util.h"
 
 ns_value variable_node::set_value(ns_rt_context *rtctx, ns_value v) {
     symbol *sym = check_symbol(id, rtctx);
@@ -85,7 +86,7 @@ ns_value builtin_func_node::eval(ns_rt_context *rtctx) {
         func_param_value_list.push_back((*it)->eval(rtctx));
     }
 
-    if (strcmp(func_name, "print") == 0) {
+    if (func_name == "print") {
 
         std::copy(func_param_value_list.begin(), func_param_value_list.end(), 
                 std::ostream_iterator<ns_value> (std::cout));
@@ -296,16 +297,16 @@ ns_value dot_call_method_node::eval(ns_rt_context *rtctx) {
     std::vector<ns_value> *plist = arglist.list_val;
 
     if (arr.is_array() && arglist.is_array()) {
-        if (strcmp(name, "append") == 0) {
+        if (name == "append") {
             if (arglist.len() == 1) {
                 arr.append((*plist)[0]);
                 return arr;
             }
         }
-        else if (strcmp(name, "len") == 0) {
+        else if (name == "len") {
             return ns_value(arr.len()); 
         }
-        else if (strcmp(name, "del") == 0) {
+        else if (name ==  "del") {
             if (arglist.len() == 1) {
                 ns_value arg = (*plist)[0];
                 if (arg.is_int()) {
@@ -320,7 +321,7 @@ ns_value dot_call_method_node::eval(ns_rt_context *rtctx) {
             }
             return arr;
         }
-        else if (strcmp(name, "find") == 0) {
+        else if (name == "find") {
             if (arglist.len() == 1) {
                 int idx = arr.find((*plist)[0]);
                 if (idx == -1) {

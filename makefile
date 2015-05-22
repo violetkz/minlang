@@ -10,7 +10,7 @@ all: ns
 #	#mv ns.tab.c ns.tab.cpp
 #	g++ -g -o ns ns.tab.c ns_lex.cpp ns_ast.cpp
 
-ns: ns_symtbl.o ns.tab.o ns_lex.o ns_value.o ns_ast.o minlang.o
+ns: ns_symtbl.o ns.tab.o ns_lex.o ns_value.o ns_ast.o minlang.o ns_util.o
 	g++ ${CPPFLAGS} -o minlang $^
 
 minlang.o:minlang.cpp ns.tab.o
@@ -36,6 +36,8 @@ ut_nodelist:ns_value.o ns_ast.o ut_nodelist.o
 	g++ -g -o ut_nodelist $^ 
 
 ns_value.o: ns_value.h ns_value.cpp
+
+ns_util.o:ns_util.h ns_util.cpp
 
 ut_ns_value.o: ut_ns_value.cpp
 

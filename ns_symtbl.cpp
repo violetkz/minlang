@@ -12,46 +12,61 @@
 
 
 #include <map>
-#include "ns_symtbl.h"
+#include <list>
+#include <algorithm>
 
-class ns_symtbl {
+#include "ns_symtbl.h"
+#include "ns_util.h"
+
+typedef std::list<char *> str_tbl;
+
+struct global_env {
+    symtbl  global_symtbl;
+    str_tbl global_strtbl;
+};
+
+
+class ns_global_env {
 public:
-    static symtbl *get_tbl() {
-        if (tbl == NULL) {
-            tbl = new symtbl;
+    static global_env *get_env() {
+        if (rt_env == NULL) {
+            rt_env = new global_env;
         }
-        return tbl;
+        return rt_env;
+    }
+
+    static symtbl &get_tbl() {
+        global_env *env = get_env();
+        return env->global_symtbl; 
+    }
+    
+    static str_tbl &get_strtbl() {
+        global_env *env = get_env();
+        return env->global_strtbl;
     }
 
 private:
-    static symtbl *tbl;
+    static global_env  *rt_env;
 };
 
-symtbl *ns_symtbl::tbl = NULL;
+global_env *ns_global_env::rt_env = NULL;
 
 /* install a symbol into table */
 symbol *check_symbol(const std::string& name, ns_rt_context *rt) {
 
-    symtbl *tbl = NULL;
+    symtbl &tbl = (rt) ? rt->local_env : ns_global_env::get_tbl();
 
-    if (rt) {
-        tbl = &rt->local_env;
-    }
-    else {
-        tbl = ns_symtbl::get_tbl();
-    }
-
-    symtbl_iterator it = tbl->find(name);
+    symtbl_iterator it = tbl.find(name);
 
     /* if not existed, create new item */
     symbol *n = NULL;
-    if (it == tbl->end()) { 
+    if (it == tbl.end()) { 
         n = new symbol;
         n->id = name;
-        (*tbl)[name] = n;
+        tbl[name] = n;
     }
     else {
-        n = (*tbl)[name];
+        n = tbl[name];
     }
     return n;
 }
@@ -73,11 +88,23 @@ symbol *find_symbol(const std::string& name, ns_rt_context *rt) {
     }
 
     /* search global symbol tablel. */
-    symtbl *tbl = ns_symtbl::get_tbl();
-    symtbl_iterator it = tbl->find(name);
+    symtbl &tbl = ns_global_env::get_tbl();
+    symtbl_iterator it = tbl.find(name);
 
-    if (it != tbl->end()) {
-        re = (*tbl)[name];
+    if (it != tbl.end()) {
+        re = tbl[name];
     }
     return re;
+}
+
+void put_str_to_pool(char *s) {
+    str_tbl &strtbl = ns_global_env::get_strtbl();
+    strtbl.push_back(s);
+}
+
+void clean_str_pool() {
+    str_tbl &strtbl = ns_global_env::get_strtbl();
+    std::for_each(strtbl.begin(), strtbl.end(), 
+             [](char *p) { free_raw_str(p); }
+            );
 }

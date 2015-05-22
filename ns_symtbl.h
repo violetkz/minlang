@@ -26,6 +26,7 @@ struct symbol {
     ns_value    value;
 };
 
+
 /* symbol table */
 typedef std::map<std::string, symbol*> symtbl;
 typedef std::map<std::string, symbol*>::iterator symtbl_iterator;
@@ -42,5 +43,11 @@ symbol *check_symbol(const std::string& name, ns_rt_context *rt);
 
 /* find a symbol from table by name */
 symbol *find_symbol(const std::string& name, ns_rt_context *rt);
+
+/* put str pointer into pool */
+void put_str_to_pool(char *s);
+
+/* clean string pool */
+void clean_str_pool(); 
 
 #endif //~ns_symtbl_hpp__

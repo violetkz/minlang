@@ -17,9 +17,11 @@
 #include <stdio.h>
 #include <list>
 #include <string>
+#include <algorithm>
 
 #include "ns_value.h"
 #include "ns_symtbl.h"
+#include "ns_util.h"
 
 struct symbol;
 
@@ -74,6 +76,7 @@ public:
     
     ns_value set_value(ns_rt_context *rtctx, ns_value v);
     ns_value eval(ns_rt_context *rtctx = NULL);
+    ~variable_node() {}
 public:
     std::string id;
 };
@@ -85,6 +88,7 @@ public:
         /* do nothing */
     }
     ns_value eval(ns_rt_context *rtctx = NULL);
+    ~int_node() {}
 public:
     int i;
 };
@@ -96,6 +100,7 @@ public:
         /* do nothing */
     }
     ns_value eval(ns_rt_context *rtctx = NULL);
+    ~str_node() {};
 public:
     char *str;
 };
@@ -107,6 +112,7 @@ public:
         :node(REGEX_STR_NODE), regex_str(str) {
         /* do nothing */  
     }
+    ~regex_str_node() {}
 public:
     char *regex_str;
 };
@@ -123,6 +129,13 @@ public:
     inline nl_iter begin() { return nlist.begin(); }
     inline nl_iter end() { return nlist.end(); }
     
+    ~node_list() {
+        std::for_each(nlist.begin(), nlist.end(), 
+                      [](T *n) {
+                          if (n) delete n;
+                      }
+                     );
+    }
 private:
     std::list<T*> nlist;
 };
@@ -143,8 +156,12 @@ class def_func_node : public node {
 public:
     def_func_node(char *name, identifier_list_node *args, node *stmts);
     ns_value eval(ns_rt_context *rtctx = NULL);
+    ~def_func_node() {
+        if (stmt_list) delete stmt_list;
+        if (arg_list)  delete arg_list;
+    }
 public:
-    char                 *func_name;
+    std::string          func_name;
     node                 *stmt_list;
     identifier_list_node *arg_list;
 };
@@ -156,6 +173,9 @@ public:
         : node(ARRAY_DEF_NODE), elements(elems) {
     }
     ns_value eval(ns_rt_context *rtctx = NULL);
+    ~array_def_node() {
+        if (elements) delete elements;
+    }
 public:
     exp_list_node *elements;
 };
@@ -165,6 +185,10 @@ class array_ref_node : public node {
 public:
     array_ref_node(node *pexp, node *idx_exp)
         : node(ARRAY_REF_NODE), postfix(pexp), index(idx_exp) {
+    }
+    ~array_ref_node() {
+        if(postfix) delete postfix;
+        if(index) delete index;
     }
     ns_value eval(ns_rt_context *rtctx = NULL);
 public:
@@ -179,6 +203,11 @@ public:
         :node(ASSIGN_ARRAY_REF_NODE),
         postfix(p), index(idx), rvalue(v) {
         }
+    ~assign_array_elem_node() {
+        if (postfix) delete postfix;
+        if (index) delete index;
+        if (rvalue) delete rvalue;
+    }
     ns_value eval(ns_rt_context *rtctx = NULL);
 public:
     node *postfix;
@@ -195,10 +224,14 @@ public:
         name(func_name),
         args(arglist) {
      }
+    ~dot_call_method_node() {
+        if (postfix) delete postfix;
+        if (args) delete args;
+    }
     ns_value eval(ns_rt_context *rtctx = NULL);
 public:
     node    *postfix;
-    char    *name;
+    std::string name;
     exp_list_node *args;
 };
 
@@ -217,8 +250,11 @@ public:
              rvalue(val) {
         /* do nothing */
     }
+    ~assign_node() {
+        if (variable) delete variable;
+        if (rvalue) delete rvalue;
+    }
     ns_value eval(ns_rt_context *rtctx = NULL);
-
 public:
     variable_node *variable;
     node *rvalue;
@@ -228,6 +264,10 @@ class stmt_while_node : public node {
 public:
     stmt_while_node(node *condition, stmt_list_node *stmt_list) 
         :node(STMT_WHILE_NODE), condition_exp(condition), stmts(stmt_list) {
+    }
+    ~stmt_while_node() {
+        if (condition_exp) delete condition_exp;
+        if (stmts) delete stmts;
     }
     ns_value eval(ns_rt_context *rtctx = NULL);
 public:
@@ -247,6 +287,11 @@ public:
         : node(STMT_IF_NODE), condition_exp(condition),
         stmts(action), else_stmts(else_action) {
      }
+    ~stmt_if_node() {
+        if (condition_exp) delete condition_exp;
+        if (stmts) delete stmts;
+        if (else_stmts) delete else_stmts;
+    }
 
     ns_value eval(ns_rt_context *rtctx = NULL);
 public:
@@ -260,6 +305,12 @@ public:
     stmt_for_in_node(variable_node *tmp, variable_node *ln, stmt_list_node *stmt_list)
         : node(STMT_FOR_IN_NODE), tmp_id(tmp), id(ln), stmts(stmt_list) {
     }
+    ~stmt_for_in_node() {
+        if (tmp_id) delete tmp_id;
+        if (id) delete id;
+        if (stmts) delete stmts;
+    }
+
     ns_value eval(ns_rt_context *rtctx = NULL);
 public:
     variable_node  *tmp_id;
@@ -272,7 +323,11 @@ public:
     operator_node(char opt, node *l, node *r) 
         : node(OPERATOR_NODE), opt(opt), left(l), right(r) {
     }
-    
+    ~operator_node() {
+        if (left) delete left;
+        if (right) delete right;
+    }
+
     ns_value eval(ns_rt_context *rtctx = NULL);
 public:
     char    opt; 
@@ -284,6 +339,10 @@ class compare_node : public node {
 public:
     compare_node(int opt, node *l, node *r) 
         : node(COMPARE_NODE), cmp_opt(opt), left(l), right(r) {
+    }
+    ~compare_node() {
+        if (left) delete left;
+        if (right) delete right;
     }
 
     ns_value eval(ns_rt_context *rtctx = NULL);
@@ -302,11 +361,13 @@ public:
                     plist(plist) {
         /* do nothing */
     }
-    
-    ns_value eval(ns_rt_context *rtctx = NULL);
+    ~builtin_func_node() {
+        if (plist) { delete plist; }
+    }
 
+    ns_value eval(ns_rt_context *rtctx = NULL);
 public:
-    const char *func_name;
+    std::string func_name;
     exp_list_node *plist;
 };
 
@@ -314,6 +375,9 @@ class stmt_return_node : public node {
 public:
     stmt_return_node(node *exp);
     ns_value eval(ns_rt_context *rtctx = NULL);
+    ~stmt_return_node() {
+        if (retval_exp) delete retval_exp;
+    }
 private:
     node *retval_exp;
 };
@@ -321,6 +385,7 @@ private:
 class stmt_break_node : public node {
 public:
     stmt_break_node():node(STMT_BREAK_NODE) {}
+    ~stmt_break_node() {}
     ns_value eval(ns_rt_context *rtctx = NULL) {
         return ns_value(NSVAL_STATUS, NSVAL_STATUS_BREAK);
     };
@@ -329,6 +394,7 @@ public:
 class stmt_continue_node : public node {
 public:
     stmt_continue_node():node(STMT_CONTINUE_NODE) {}
+    ~stmt_continue_node() {}
     ns_value eval(ns_rt_context *rtctx = NULL) {
         return ns_value(NSVAL_STATUS, NSVAL_STATUS_CONTINUE);
     };

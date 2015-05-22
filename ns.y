@@ -25,15 +25,13 @@ void yyerror(const char *fmt, ...);
 %union {
     char *strval;
     int   intval;
-    char *fn;
+    char *id;
     node            *ast;
     builtin_func_node   *ast_func;
     def_func_node       *ast_def_func;
     assign_node         *ast_assign;
     assign_array_elem_node *ast_assign_array_elem;
     exp_list_node       *ast_explist;
-    //rule_list_node      *ast_rules;
-    //rule_node           *ast_rule;
     stmt_list_node      *ast_stmt_list;
     stmt_if_node        *ast_stmt_if;
     stmt_while_node     *ast_stmt_while;
@@ -50,8 +48,8 @@ void yyerror(const char *fmt, ...);
 %token  IF ELSE WHILE FUNC_DEF
 %token  MAIN RETURN BREAK CONTINUE
 
-%token <strval> STR REGEXSTR  IDENTIFIER
-%token <fn>     BUILTIN_FUNC
+%token <strval> STR REGEXSTR  
+%token <id>     IDENTIFIER
 %token <intval> NUM_INT
 
 %type <ast>  stmt exp binary_operator_exp binary_compare_exp primary_exp 
@@ -82,7 +80,20 @@ start: program
 program: def_func_list main
     ;
 
-main: MAIN '{' stmt_list '}' { if ($3 != NULL) $3->eval(); }
+main: MAIN '{' stmt_list '}'
+    {
+        if ($3 != NULL) {
+            
+            // eval whole AST Tree.
+            $3->eval();
+        
+            // release AST tree
+            delete $3;      
+        }
+        
+        // clean string pool
+        clean_str_pool();
+    }
     ;
 
 def_func_list:  /* empty */
@@ -188,9 +199,8 @@ exp_list: {$$ = new exp_list_node;}
                     }
     ;
 
-/* func_exp: BUILTIN_FUNC '(' exp_list ')'  */
 func_exp: IDENTIFIER '(' exp_list ')'
-        { $$ = new builtin_func_node($1, $3); }
+        {$$ = new builtin_func_node($1, $3); }
     ;
 
 def_func_exp: FUNC_DEF IDENTIFIER '(' identifier_list ')' '{' stmt_list '}'

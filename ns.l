@@ -17,10 +17,9 @@
 #include "ns_ast.h"
 #include "ns.tab.h"
 #include "ns_symtbl.h"
+#include "ns_util.h"
 
 extern void yyerror(const char *s, ...);
-
-char *makebuffer(size_t n);
 
 %}
 %%
@@ -47,26 +46,16 @@ char *makebuffer(size_t n);
 ">="    { return CMP_GE; }
 "<="    { return CMP_LE; }
 
-
-"len"    |
-"substr" |
-"split"  |
-"print"  |
-"getline"  {
-    /* yylval.fn = strdup(yytext); return BUILTIN_FUNC;
-       */
-                yylval.strval = strdup(yytext);
-                return IDENTIFIER; 
-        }
-
 [0-9]+     {yylval.intval = atoi(yytext); return NUM_INT;}
+
 [A-Za-z_][A-Za-z0-9_]*  { 
-                /* yylval.sym = check_symbol(yytext);  */
-                yylval.strval = strdup(yytext);
+                yylval.id = strdup(yytext);
+                put_str_to_pool(yylval.id);
                 return IDENTIFIER; 
                }
+
 r{0,1}\"[^"]*\" { 
-                char *buff = makebuffer(yyleng + 1);
+                char *buff = make_raw_str_buffer(yyleng + 1);
                 char str_type = yytext[0];
                 int skip_num = 0;
                 if (str_type == 'r') { /* regrex str */
@@ -83,6 +72,7 @@ r{0,1}\"[^"]*\" {
                 }
                 *d = '\0'; /* make sure a end-char */
                 yylval.strval = buff;
+                put_str_to_pool(buff);
                 return STR;
                 }
 "." |
@@ -103,13 +93,3 @@ r{0,1}\"[^"]*\" {
 
 .           { yyerror("unkown token."); }
 %%
-
-char* makebuffer(size_t n) {
-    char* buff = (char *)malloc(n);
-    memset(buff, 0x00, n);
-    return buff;
-}
-
-void free_strval(char *s) {
-    if (s != NULL) free(s);
-}
