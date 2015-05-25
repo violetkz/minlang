@@ -135,12 +135,17 @@ ns_value stmt_if_node::eval(ns_rt_context *rtctx) {
 
 ns_value stmt_while_node::eval(ns_rt_context *rtctx) {
     ns_value retval(NSVAL_STATUS, NSVAL_STATUS_OK);
+    
+    // here, need capture the break/continue status
     while (condition_exp->eval(rtctx)) {
-        retval = stmts->eval(rtctx);
-        if (retval.is_status_break() || retval.is_illegal_value()) 
+        ns_value stmts_re = stmts->eval(rtctx);
+        if (stmts_re.is_status_break() ) 
             break;
-        else if (retval.is_status_continue()) {
+        else if (stmts_re.is_status_continue()) {
             continue;
+        }
+        else if (stmts_re.is_illegal_value()) {
+            retval = stmts_re;
         }
     }
     return retval;

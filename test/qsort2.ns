@@ -6,51 +6,63 @@ def qsort(arr, start_idx, len) {
     if (len <= 1) {
         return;
     } else {
-        mid_val = arr[0];
-        
+        mid_val = arr[start_idx];
+        print("mod-val:", mid_val);
         end_idx = start_idx + len;
         i = start_idx;
         j = end_idx - 1;
-        print("end:", end_idx);
         while (1) {
-            while ((i < end_idx) and (arr[i] <= mid_val)) {
-                i = i + 1;
+            while (i < end_idx) {
+                if (arr[i] < mid_val) {
+                    i = i + 1;
+                }
+                else { break; }
             }
             
-            print("J:", j);
-            while ((j > 0) and (arr[j] > mid_val)) {
-                j = j - 1;
+            while (j > 0) { 
+                if (arr[j] > mid_val) {
+                    j = j - 1;
+                }
+                else { break; }
             }
 
-            
             if (i >= j) { break; }
             else {
-                tmp = arr[i];
-                arr[i] = arr[j];
-                arr[j] = tmp;
-                i = i + 1;
-                j = j - 1;
+                if (arr[i] > arr[j]) {
+                    tmp = arr[i];
+                    arr[i] = arr[j];
+                    arr[j] = tmp;
+                }
+                    i = i + 1;
+                    j = j - 1;
             }
         }
-        print ("---Key: ", 3);
+        
+        key = i;
+        print ("---Key: ", i);
+        left_len = key - start_idx;
+        right_len = end_idx - key;
+        if ((left_len == 0) or (right_len == 0)) {
+            return;
+        }
 
         print(arr);
-        print("1-", start_idx, ":", i - start_idx);
-        qsort(arr, start_idx, i - start_idx);
-        print("2-", j, ":", end_idx - j);
-        qsort(arr, j, end_idx - j);
+        qsort(arr, start_idx, left_len);
+        qsort(arr, key, right_len);
     }
 }
 
 main {
 #arr = [1, 0, 9,3, 92, 2078, 10];
-    arr = [1,0,1,1];
+#    arr = [1,0,1,1];
     
-#arr2 = [80, 51, 41, 38, 75, 91, 88, 88, 52, 96, 88, 99, 71, 95, 35, 28, 92, 30, 90, 93, 94, 88, 71, 29, 62, 36, 53, 68, 85, 40, 45, 70, 43, 68, 38, 86, 87, 73, 76, 49, 82, 72, 92, 74, 62, 70, 73, 63, 92, 62];
-arr2 = [80, 51, 41, 38, 75, 91, 88, 88, 52, 96, 88];
-    qsort(arr, 0, arr.len());
-    print(arr);
+    arr2 = [80, 51, 41, 38, 75, 91, 88, 88, 52, 96, 88];
+#    qsort(arr, 0, arr.len());
+#    print(arr);
 
     qsort(arr2,0, arr2.len());
     print(arr2);
+#    arr3 = [80, 51, 41, 38, 75, 91, 88, 88, 52, 96, 88, 99, 71, 95, 35, 28, 92, 30, 90, 93, 94, 88, 71, 29, 62, 36, 53, 68, 85, 40, 45, 70, 43, 68, 38, 86, 87, 73, 76, 49, 82, 72, 92, 74, 62, 70, 73, 63, 92, 62];
+#    qsort(arr3,0, arr3.len());
+#    print(arr3);
 }
