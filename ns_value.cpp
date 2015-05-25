@@ -213,12 +213,29 @@ std::ostream &operator << (std::ostream &out, const ns_value &v) {
 
 ns_value operator+ (const ns_value &l, const ns_value &r) {
     if (l.type == r.type) {
-        if (l.type == NSVAL_INTEGER) {
+        if (l.is_int()) {
             return ns_value(l.int_val + r.int_val);
         }
-        else if (l.type == NSVAL_LITERAL_STR) {
+        else if (l.is_raw_string()) {
             std::string tmp = *l.chr_val + *r.chr_val;
             return  ns_value(tmp.c_str());
+        }
+        else if (l.is_array()) {
+            ns_value new_list(NSVAL_LIST);
+            if (new_list.list_val) {
+                std::for_each(l.list_val->begin(), l.list_val->end(),
+                         [&new_list](const ns_value &n) {
+                           new_list.list_val->push_back(n); 
+                         }
+                        );
+                std::for_each(r.list_val->begin(), r.list_val->end(), 
+                         [&new_list](const ns_value &n) {
+                           new_list.list_val->push_back(n); 
+                         }
+                        );
+                return new_list;
+            }
+            
         }
         return ns_value(NSVAL_ILLEGAL);
     }
@@ -315,7 +332,7 @@ bool operator > (const ns_value &l, const ns_value &r) {
 }
 
 bool operator <  (const ns_value &l, const ns_value &r) {
-    return !(operator> (l, r));
+    return !(operator> (l, r) || operator== (l, r));
 }
 
 bool operator <= (const ns_value &l, const ns_value &r) {

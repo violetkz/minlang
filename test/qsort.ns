@@ -1,0 +1,43 @@
+## Quick-Sort test
+#for performance, it is so bad. but herre I just test syntax. 
+def qsort(arr) {
+    smaller = [];
+    bigger  = [];
+
+    len = arr.len();
+    if (len <= 1) {
+        return  arr;
+    }
+
+    x = arr[0];  ## the first element as compariaton value
+    i = 1;
+    while (i < len) {
+        if (x < arr[i]) {
+            bigger.append(arr[i]);
+        }
+        else {
+            smaller.append(arr[i]);
+        }
+        i = i + 1;
+    }
+    return qsort(smaller).append(x) + qsort(bigger);
+}
+
+main {
+    a = [
+        [], 
+        [1],
+        [3,2,9],
+        [9923,281,1,8342,2,72,63264,4576],
+        [80, 51, 41, 38, 75, 91, 88, 88, 52, 96, 88, 99, 71, 95, 35, 28, 92, 30, 90, 93, 94, 88, 71, 29, 62, 36, 53, 68, 85, 40, 45, 70, 43, 68, 38, 86, 87, 73, 76, 49, 82, 72, 92, 74, 62, 70, 73, 63, 92, 62]
+    ];
+
+    l = a.len();
+    i = 0;
+    while (i < l) {
+        print("sorting : ", a[i]);
+        sorted = qsort(a[i]); 
+        print("sorted  : ", sorted);
+        i = i + 1;
+    }
+}

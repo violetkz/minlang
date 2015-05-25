@@ -10,7 +10,6 @@
  * Library General Public License for more details.
  */
 
-
 #include <cassert>
 #include <cstdio>
 #include <cstring>
