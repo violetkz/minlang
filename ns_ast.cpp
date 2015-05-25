@@ -196,8 +196,13 @@ ns_value operator_node::eval(ns_rt_context *rtctx) {
 ns_value compare_node::eval(ns_rt_context *rtctx) {
 
     ns_value l = left->eval(rtctx);
-    ns_value r = right->eval(rtctx);
+    if (cmp_opt == AND) { /* fast death */
+        if (!l) {
+            return ns_value(false);
+        }
+    }
 
+    ns_value r = right->eval(rtctx);
     bool v = false;
     switch (cmp_opt) {
         case CMP_GT:

@@ -1,0 +1,12 @@
+
+main{
+    i = 0;
+    a = [1,2,3];
+    while (1) {
+    ## test operator 'and'
+        if ((i < 3) and a[i] <= 3) {
+            i = i + 1;
+        }
+        else {break;}
+    }
+}
