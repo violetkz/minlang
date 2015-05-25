@@ -15,21 +15,24 @@ def qsort(arr, start_idx, len) {
         while (1) {
             while ((i < end_idx) and (arr[i] <= mid_val)) {
                 i = i + 1;
-                print(i);
             }
             
-            print(j);
+            print("J:", j);
             while ((j > 0) and (arr[j] > mid_val)) {
                 j = j - 1;
             }
 
+            
             if (i >= j) { break; }
             else {
                 tmp = arr[i];
                 arr[i] = arr[j];
                 arr[j] = tmp;
+                i = i + 1;
+                j = j - 1;
             }
         }
+        print ("---Key: ", 3);
 
         print(arr);
         print("1-", start_idx, ":", i - start_idx);
