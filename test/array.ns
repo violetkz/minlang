@@ -9,4 +9,8 @@ main {
     
     a = ([99,90][1] = "TEST");
     print (a);
+
+    b = ["xxx", "---"];
+    c = a + b;
+    print(c);
 }

@@ -100,7 +100,7 @@ def_func_list:  /* empty */
     | def_func_list def_func_exp 
  
 
-stmt:    FOR variable IN variable '{' stmt_list '}'  
+stmt:    FOR variable IN exp '{' stmt_list '}'  
                 { $$ = new stmt_for_in_node($2, $4, $6); }
         | WHILE '(' exp ')' '{' stmt_list '}'
                 { $$ = new stmt_while_node($3, $6); }
@@ -132,7 +132,6 @@ exp: binary_operator_exp
    | primary_exp
    | assign_exp {$$ = $1;}
    | assign_array_elem_exp {$$ = $1;}
-   | array_ref  {$$ = $1;}       
    | dot_call_method_exp {$$=$1;}
    ;
 
@@ -165,6 +164,7 @@ primary_exp:
     | '[' exp_list ']'  { $$ = new array_def_node($2);         }
     | func_exp          { $$ = $1; }
     | variable          { $$ = $1; }
+    | array_ref  {$$ = $1;}       
     ;
 
 variable: IDENTIFIER { $$ = new variable_node($1); }

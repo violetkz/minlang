@@ -117,8 +117,10 @@ ns_value::ns_value(const ns_value &s)
     else if (type == NSVAL_BOOLEAN)  bool_val = s.bool_val;
     else if (type == NSVAL_LIST)     list_val = s.list_val;
     else if (type == NSVAL_EXPERESS_AST) node_val = s.node_val;
+    else if (type == NSVAL_UNINITIALIZED) { /* do nothing */ }
+    else if (type == NSVAL_ILLEGAL)       { /* do nothing */ }
     else {
-        std::cerr << "Warning! the constractor can't handle un-defined type" 
+        std::cerr << "Warning! the copy constractor can't handle un-defined type" 
                 << std::endl;
         int_val = 0;
     }
@@ -140,8 +142,10 @@ ns_value &ns_value::operator = (const ns_value &s) {
     else if (type == NSVAL_BOOLEAN)  bool_val = s.bool_val;
     else if (type == NSVAL_LIST)     list_val = s.list_val;
     else if (type == NSVAL_EXPERESS_AST) node_val = s.node_val;
+    else if (type == NSVAL_UNINITIALIZED) { /* do nothing */ }
+    else if (type == NSVAL_ILLEGAL)       { /* do nothing */ }
     else {
-        std::cerr << "Warning! the constractor can't handle un-defined type. " << type  << std::endl;
+        std::cerr << "Warning! the operator= can't handle un-defined type. " << type  << std::endl;
         int_val = 0;
     }
     return *this;
@@ -213,12 +217,29 @@ std::ostream &operator << (std::ostream &out, const ns_value &v) {
 
 ns_value operator+ (const ns_value &l, const ns_value &r) {
     if (l.type == r.type) {
-        if (l.type == NSVAL_INTEGER) {
+        if (l.is_int()) {
             return ns_value(l.int_val + r.int_val);
         }
-        else if (l.type == NSVAL_LITERAL_STR) {
+        else if (l.is_raw_string()) {
             std::string tmp = *l.chr_val + *r.chr_val;
             return  ns_value(tmp.c_str());
+        }
+        else if (l.is_array()) {
+            ns_value new_list(NSVAL_LIST);
+            if (new_list.list_val) {
+                std::for_each(l.list_val->begin(), l.list_val->end(),
+                         [&new_list](const ns_value &n) {
+                           new_list.list_val->push_back(n); 
+                         }
+                        );
+                std::for_each(r.list_val->begin(), r.list_val->end(), 
+                         [&new_list](const ns_value &n) {
+                           new_list.list_val->push_back(n); 
+                         }
+                        );
+                return new_list;
+            }
+            
         }
         return ns_value(NSVAL_ILLEGAL);
     }
@@ -315,7 +336,7 @@ bool operator > (const ns_value &l, const ns_value &r) {
 }
 
 bool operator <  (const ns_value &l, const ns_value &r) {
-    return !(operator> (l, r));
+    return !(operator> (l, r) || operator== (l, r));
 }
 
 bool operator <= (const ns_value &l, const ns_value &r) {
@@ -357,6 +378,9 @@ int  ns_value::len() {
     int len = 0;
     if (is_array() && list_val != NULL) {
         len = list_val->size();
+    }
+    else if (is_raw_string() && chr_val) {
+        len = chr_val->size();
     }
     return len;
 }

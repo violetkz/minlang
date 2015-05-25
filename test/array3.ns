@@ -1,0 +1,12 @@
+
+main {
+    a = ["xx", [9,"xx"], 99];
+    print (a);
+    print (a[1]);
+
+    a[1].append("new element");
+    print(a[1].len());
+    print (a);
+
+    print("-----".len());
+}
