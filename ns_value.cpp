@@ -117,8 +117,10 @@ ns_value::ns_value(const ns_value &s)
     else if (type == NSVAL_BOOLEAN)  bool_val = s.bool_val;
     else if (type == NSVAL_LIST)     list_val = s.list_val;
     else if (type == NSVAL_EXPERESS_AST) node_val = s.node_val;
+    else if (type == NSVAL_UNINITIALIZED) { /* do nothing */ }
+    else if (type == NSVAL_ILLEGAL)       { /* do nothing */ }
     else {
-        std::cerr << "Warning! the constractor can't handle un-defined type" 
+        std::cerr << "Warning! the copy constractor can't handle un-defined type" 
                 << std::endl;
         int_val = 0;
     }
@@ -140,8 +142,10 @@ ns_value &ns_value::operator = (const ns_value &s) {
     else if (type == NSVAL_BOOLEAN)  bool_val = s.bool_val;
     else if (type == NSVAL_LIST)     list_val = s.list_val;
     else if (type == NSVAL_EXPERESS_AST) node_val = s.node_val;
+    else if (type == NSVAL_UNINITIALIZED) { /* do nothing */ }
+    else if (type == NSVAL_ILLEGAL)       { /* do nothing */ }
     else {
-        std::cerr << "Warning! the constractor can't handle un-defined type. " << type  << std::endl;
+        std::cerr << "Warning! the operator= can't handle un-defined type. " << type  << std::endl;
         int_val = 0;
     }
     return *this;

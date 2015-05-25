@@ -1,0 +1,10 @@
+
+def fs () {
+    arr = [9,1, 20, 938, 27];
+    for a in arr {
+        if (9 % 3 == 0) { print(a); }
+    }
+}
+main {
+    fs();
+}

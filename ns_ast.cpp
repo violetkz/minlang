@@ -147,7 +147,26 @@ ns_value stmt_while_node::eval(ns_rt_context *rtctx) {
 }
 
 ns_value stmt_for_in_node::eval(ns_rt_context *rtctx) {
-    return ns_value(NSVAL_STATUS, NSVAL_STATUS_OK);
+    tmp_id->eval(rtctx); 
+    ns_value v = id->eval(rtctx);
+    if (v.is_array() && v.list_val) {
+        auto it = v.list_val->begin();
+        bool run_status = true;
+        for (; it != v.list_val->end(); ++it) {
+            
+            tmp_id->set_value(rtctx, *it);
+
+            ns_value status = stmts->eval(rtctx);
+            if (status.is_illegal_value()) {
+                run_status = false;
+                break;
+            }
+        }
+
+        if (run_status) return ns_value(NSVAL_STATUS, NSVAL_STATUS_OK);
+        
+    }
+    return ns_value(NSVAL_ILLEGAL);
 }
 
 ns_value operator_node::eval(ns_rt_context *rtctx) {
@@ -262,7 +281,7 @@ def_func_node::def_func_node(char *name, identifier_list_node *args, node *stmts
 ns_value def_func_node::eval(ns_rt_context *rtctx) {
 
     // push paramter stack
-    if (rtctx->func_param_list->size() == arg_list->size()) {
+    if (arg_list != NULL && rtctx->func_param_list->size() == arg_list->size()) {
         auto it = arg_list->begin();
         auto pit = rtctx->func_param_list->begin();
         for (; it != arg_list->end(); ++it, ++pit) {

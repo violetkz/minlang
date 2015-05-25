@@ -1,5 +1,5 @@
 ## Quick-Sort test
-#for performance, it is so bad. but herre I just test syntax. 
+#for performance, it is so bad. but here I just test syntax. 
 def qsort(arr) {
     smaller = [];
     bigger  = [];
@@ -9,7 +9,7 @@ def qsort(arr) {
         return  arr;
     }
 
-    x = arr[0];  ## the first element as compariaton value
+    x = arr[0];  ## the first element as comparison value
     i = 1;
     while (i < len) {
         if (x < arr[i]) {

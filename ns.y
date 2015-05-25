@@ -100,7 +100,7 @@ def_func_list:  /* empty */
     | def_func_list def_func_exp 
  
 
-stmt:    FOR variable IN variable '{' stmt_list '}'  
+stmt:    FOR variable IN exp '{' stmt_list '}'  
                 { $$ = new stmt_for_in_node($2, $4, $6); }
         | WHILE '(' exp ')' '{' stmt_list '}'
                 { $$ = new stmt_while_node($3, $6); }

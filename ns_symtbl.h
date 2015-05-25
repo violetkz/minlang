@@ -24,6 +24,7 @@
 struct symbol {
     std::string id;
     ns_value    value;
+    
 };
 
 /* symbol table */

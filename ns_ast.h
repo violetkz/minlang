@@ -302,7 +302,7 @@ public:
 
 class stmt_for_in_node : public node {
 public:
-    stmt_for_in_node(variable_node *tmp, variable_node *ln, stmt_list_node *stmt_list)
+    stmt_for_in_node(variable_node *tmp, node *ln, stmt_list_node *stmt_list)
         : node(STMT_FOR_IN_NODE), tmp_id(tmp), id(ln), stmts(stmt_list) {
     }
     ~stmt_for_in_node() {
@@ -314,7 +314,7 @@ public:
     ns_value eval(ns_rt_context *rtctx = NULL);
 public:
     variable_node  *tmp_id;
-    variable_node  *id; 
+    node           *id; 
     stmt_list_node  *stmts;
 };
 
