@@ -336,6 +336,11 @@ ns_value dot_call_method_node::eval(ns_rt_context *rtctx) {
             return ns_value(NSVAL_ILLEGAL);
         }
     }
+    else if (arr.is_raw_string()) {
+        if (name == "len") {
+            return ns_value(arr.len());
+        }
+    }
 
     return ns_value(NSVAL_ILLEGAL);
 }

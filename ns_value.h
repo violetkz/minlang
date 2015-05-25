@@ -82,6 +82,10 @@ public:
     inline bool is_array() const {
         return type == NSVAL_LIST;
     }
+    
+    inline bool is_raw_string() const {
+        return type == NSVAL_LITERAL_STR;
+    }
 
     inline bool is_iteratale() const { 
         return (type == NSVAL_LITERAL_STR || type == NSVAL_LIST); 

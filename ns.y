@@ -132,7 +132,6 @@ exp: binary_operator_exp
    | primary_exp
    | assign_exp {$$ = $1;}
    | assign_array_elem_exp {$$ = $1;}
-   | array_ref  {$$ = $1;}       
    | dot_call_method_exp {$$=$1;}
    ;
 
@@ -165,6 +164,7 @@ primary_exp:
     | '[' exp_list ']'  { $$ = new array_def_node($2);         }
     | func_exp          { $$ = $1; }
     | variable          { $$ = $1; }
+    | array_ref  {$$ = $1;}       
     ;
 
 variable: IDENTIFIER { $$ = new variable_node($1); }

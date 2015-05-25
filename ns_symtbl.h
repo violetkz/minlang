@@ -26,7 +26,6 @@ struct symbol {
     ns_value    value;
 };
 
-
 /* symbol table */
 typedef std::map<std::string, symbol*> symtbl;
 typedef std::map<std::string, symbol*>::iterator symtbl_iterator;

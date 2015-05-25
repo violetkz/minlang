@@ -358,6 +358,9 @@ int  ns_value::len() {
     if (is_array() && list_val != NULL) {
         len = list_val->size();
     }
+    else if (is_raw_string() && chr_val) {
+        len = chr_val->size();
+    }
     return len;
 }
 
