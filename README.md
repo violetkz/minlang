@@ -29,7 +29,7 @@ and also be able to define own function.
     }
     ```
 
-* Array
+* Dynamic Array
     ```
     ## array test
     main {
@@ -71,6 +71,60 @@ and also be able to define own function.
 
     main {
         print("fibonacci(30):", fn(30));
+    }
+    ```
+
+* cool! let's make a quick-sort.
+
+    ```
+    def parition(arr, start_idx, end_idx) 
+    {
+        mid_val = arr[(start_idx + end_idx)/2];
+
+        i = start_idx;
+        j = end_idx;
+       
+        while (i <= j) {
+            while(arr[i] < mid_val) {
+                i = i + 1;
+            }
+            while(arr[j] > mid_val) {
+                j = j - 1;
+            }
+            if (i <= j) {
+                tmp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = tmp;
+                i = i + 1;
+                j = j - 1;
+            }
+        }
+        return i;
+    }
+
+    def qsort(arr, start_idx, end_idx) {
+        index = parition(arr, start_idx, end_idx);
+        if (start_idx < index - 1) {
+            qsort(arr, start_idx, index - 1);
+        }
+        if (index < end_idx) {
+            qsort(arr, index,  end_idx);
+        }
+    }
+    
+    main {
+        testcases = [
+            [1],
+            [3,2,9],
+            [9923,281,1,8342,2,72,63264,4576],
+            [80, 51, 41, 38, 75, 91, 88, 88, 52, 96, 88, 99, 71, 95, 35, 28]
+        ];
+
+        for tc in testcases {
+            print("sorting :", tc);
+            qsort(tc, 0, tc.len() -1);
+            print("sorted  :", tc);
+        }
     }
     ```
 

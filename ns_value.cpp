@@ -353,7 +353,8 @@ ns_value ns_value::get_elem(unsigned int index) {
         if (list_val->size() > index)
             return list_val->at(index);
         else
-            std::cerr << "Bad index of array!" << std::endl;
+            std::cerr << "Bad index of array! Max Index:" << list_val->size() 
+                    << " Error:" << index  << std::endl;
     }
 
     return ns_value(NSVAL_ILLEGAL);
