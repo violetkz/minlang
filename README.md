@@ -1,15 +1,15 @@
 # minlang
-The 'minlang' is minimal program language just for fun.
+The 'minlang' is minimal program language just for fun. :laughing:
 
-## about *minlang*
+## :four_leaf_clover:about *minlang*
 *minlang* looks like C language except without strict data type declaration.
 so it is a dynamic language.
 currently, it support Integer calculation,string operation and dynamic array.
 and also be able to define own function. 
 
-## examples:
+## :zap: examples:
 
-* see hello to world.  :-)
+* see hello to world.  :sunglasses:
     ```c
     main { 
         print("Hello World!");
@@ -59,7 +59,7 @@ and also be able to define own function.
     }
     ```
 
-* Oh, Fibonacci! haha
+* Oh, Fibonacci! :fire:
 
     ```c
     def fibonacci (n) {
@@ -74,7 +74,7 @@ and also be able to define own function.
     }
     ```
 
-* cool! let's make a quick-sort.
+* cool :bangbang: let's make a quick-sort.
 
     ```c
     def parition(arr, start_idx, end_idx) 
