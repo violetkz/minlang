@@ -10,14 +10,14 @@ and also be able to define own function.
 ## examples:
 
 * see hello to world.  :-)
-    ```
+    ```c
     main { 
         print("Hello World!");
     }
     ```
 
 * simple logic/math calculation
-    ```
+    ```c
     main {
         i = 9;
         while(i > 0) {
@@ -30,7 +30,7 @@ and also be able to define own function.
     ```
 
 * Dynamic Array
-    ```
+    ```c
     ## array test
     main {
         a = [99, "string", 88];
@@ -61,7 +61,7 @@ and also be able to define own function.
 
 * Oh, Fibonacci! haha
 
-    ```
+    ```c
     def fibonacci (n) {
         if (n == 0 or n == 1) {
             return n;
@@ -76,7 +76,7 @@ and also be able to define own function.
 
 * cool! let's make a quick-sort.
 
-    ```
+    ```c
     def parition(arr, start_idx, end_idx) 
     {
         mid_val = arr[(start_idx + end_idx)/2];

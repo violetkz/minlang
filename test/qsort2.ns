@@ -24,7 +24,7 @@ def parition(arr, start_idx, end_idx)
     return i;
 }
 
-## QuicSort 
+## QuickSort 
 def qsort(arr, start_idx, end_idx) {
     index = parition(arr, start_idx, end_idx);
     if (start_idx < index - 1) {
