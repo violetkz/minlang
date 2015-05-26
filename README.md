@@ -44,7 +44,7 @@ and also be able to define own function.
     ```
 
     anthoer one:
-    ```
+    ```c
     main {
         a = [];
         i = 0;
@@ -128,9 +128,9 @@ and also be able to define own function.
     }
     ```
 
-## why do I make *minlang*. 
+## :four_leaf_clover:why do I make *minlang*. 
 
-* It is realy funny.
-* For better understanding program language.
+* It is realy funny.:rocket:
+* For better understanding program language.:feet:
 
 *minlang* created by Flex, Bison and Cpp. 
