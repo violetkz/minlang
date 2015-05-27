@@ -7,6 +7,20 @@ so it is a dynamic language.
 currently, it support Integer calculation,string operation and dynamic array.
 and also be able to define own function. 
 
+## :airplane: try it.
+first, compile src code. since *minlang* depend on c++11 standard, GCC need
+be at least 4.7 or later in Linux/Cgywin/mingw platform. the version of CLang
+need be 2.9+ in MacOS
+    ```shell
+    $ make                        #for Linux/cygwin
+    $ make -f makefile.mingw      #for mingw32 
+    $ make -f makefile.mac        #for MacOS
+    ```
+then, play it. :tada:
+    ```shell
+    $ ./minlang -f test/qsort.ns
+    ```
+
 ## :zap: examples:
 
 * see hello to world.  :sunglasses:

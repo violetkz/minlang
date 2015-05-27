@@ -35,8 +35,14 @@ void parse_args(int argc, char** argv,  cmdline_opt* opts) {
 
     int c;
     int errflg = 0;
+
+    if (argc < 3) {
+        errflg = 1;
+        goto err;
+    }
+
     extern char* optarg;
-    while ((c = getopt(argc, argv, "f:h")) != -1)
+    while ((c = getopt(argc, argv, "f:h")) != -1) {
         switch (c) {
             case 'f' :
                 opts->filename = optarg;
@@ -47,7 +53,9 @@ void parse_args(int argc, char** argv,  cmdline_opt* opts) {
             default :
                 errflg = 1;
         }
+    }
 
+err:
     if (errflg) {
         print_usage();
         exit (2);
