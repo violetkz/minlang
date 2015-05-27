@@ -105,7 +105,8 @@ stmt:    FOR variable IN exp '{' stmt_list '}'
         | WHILE '(' exp ')' '{' stmt_list '}'
                 { $$ = new stmt_while_node($3, $6); }
         | IF '(' exp ')' '{' stmt_list '}'
-                { $$ = new stmt_if_node($3, $6); }
+                {  yyerror("lineno");
+                $$ = new stmt_if_node($3, $6); }
         | IF '(' exp ')' '{' stmt_list '}' ELSE '{' stmt_list '}'
                 { $$ = new stmt_if_node($3, $6, $10); }
         | exp ';'           { $$ = $1; }

@@ -353,21 +353,23 @@ ns_value ns_value::get_elem(unsigned int index) {
         if (list_val->size() > index)
             return list_val->at(index);
         else
-            std::cerr << "Bad index of array! Max Index:" << list_val->size() 
+            std::cerr << "-E-: Bad index of array! Max Index:" << list_val->size() 
                     << " Error:" << index  << std::endl;
     }
 
     return ns_value(NSVAL_ILLEGAL);
 }
 
-void ns_value::set_elem(unsigned int index, const ns_value& v) {
+bool ns_value::set_elem(unsigned int index, const ns_value& v) {
 
     if (is_array() && list_val != NULL) {
         if (list_val->size() > index)
             (*list_val)[index] = v;
         else 
-            std::cerr << "Bad index of array!" << std::endl;
+            std::cerr << "-E-: Bad index of array!" << std::endl;
+            return false; 
     }
+    return true;
 }
 
 void    ns_value::append(const ns_value &v) {

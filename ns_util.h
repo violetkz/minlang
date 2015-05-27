@@ -12,8 +12,18 @@
 
 #ifndef ns_util__hpp
 #define ns_util__hpp
+#include "ns_value.h"
 
+/* raw string buffer */
 char* make_raw_str_buffer(size_t n);
+/* free the string buffer */
 void  free_raw_str(char*);
 
+/* handle eval status */
+const ns_value eval_status_ok(NSVAL_STATUS, NSVAL_STATUS_OK);
+const ns_value eval_illegal(NSVAL_ILLEGAL);
+
+/* runtime panic */
+std::ostream &ns_panic(int lineno);
+std::ostream &ns_trace(int lineno);
 #endif

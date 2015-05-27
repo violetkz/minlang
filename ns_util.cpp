@@ -12,6 +12,7 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 #include "ns_util.h"
 
 char* make_raw_str_buffer(size_t n) {
@@ -22,4 +23,12 @@ char* make_raw_str_buffer(size_t n) {
 
 void  free_raw_str(char *s) {
     if (s != NULL) free(s);
+}
+ 
+std::ostream &ns_panic(int lineno) {
+    return std::cerr<< "-E- line[" << lineno << "] ";
+}
+
+std::ostream &ns_trace(int lineno) {
+    return std::cerr<< "-T- line[" << lineno << "] ";
 }

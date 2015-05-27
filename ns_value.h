@@ -102,7 +102,12 @@ public:
     inline bool is_status_continue() const {
         return type == NSVAL_STATUS && int_val == NSVAL_STATUS_CONTINUE;
     }
-
+    
+    inline bool is_exceptional_val() const {
+        return type == NSVAL_ILLEGAL 
+            || type == NSVAL_UNINITIALIZED
+            || (type == NSVAL_STATUS && int_val == NSVAL_STATUS_FAILED);
+    }
     inline bool is_status_ok() const {
         return  (type == NSVAL_STATUS && int_val == NSVAL_STATUS_OK) 
                 || (type != NSVAL_ILLEGAL) 
@@ -111,7 +116,7 @@ public:
 
     /* some builtin func for array type */
     ns_value get_elem(unsigned int index);
-    void     set_elem(unsigned int index, const ns_value &v);
+    bool     set_elem(unsigned int index, const ns_value &v);
     void    append(const ns_value &v);
     int  len();
     void    del(size_t idx);

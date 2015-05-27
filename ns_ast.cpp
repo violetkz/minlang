@@ -36,6 +36,8 @@ ns_value variable_node::set_value(ns_rt_context *rtctx, ns_value v) {
 ns_value variable_node::eval(ns_rt_context *rtctx) {
     symbol *sym = check_symbol(id, rtctx);
     if (!sym) {
+        ns_panic(lineno) << "can't find symbol `" << id  
+                 << "` in symbol table";
     }
     return sym->value;
 }
@@ -60,7 +62,7 @@ ns_value exp_list_node::eval(ns_rt_context *rtctx) {
 
 ns_value assign_node::eval(ns_rt_context *rtctx) {
     variable->set_value(rtctx, rvalue->eval(rtctx));
-    return ns_value(NSVAL_STATUS, NSVAL_STATUS_OK);
+    return eval_status_ok;
 }
 
 ns_value assign_array_elem_node::eval(ns_rt_context *rtctx) {
@@ -69,11 +71,16 @@ ns_value assign_array_elem_node::eval(ns_rt_context *rtctx) {
     if (pv.is_iteratale()) {
         ns_value idx = index->eval(rtctx);        
         if (idx.is_int()) {
-            pv.set_elem(idx.int_val, rvalue->eval(rtctx));  
+            if (!pv.set_elem(idx.int_val, rvalue->eval(rtctx))) {
+                ns_panic(lineno) << "set element failed." << std::endl;  
+            }
         }
         return pv;
     }
-    return ns_value(NSVAL_ILLEGAL);
+    else {
+        ns_trace(lineno) << "eval failed in assign stmt" << std::endl;
+    }
+    return eval_illegal;
 }
 
 ns_value builtin_func_node::eval(ns_rt_context *rtctx) {
@@ -112,11 +119,11 @@ ns_value builtin_func_node::eval(ns_rt_context *rtctx) {
             }
         }
         else {
-            std::cerr << "can't find the symbol: " << func_name << std::endl;
-            return ns_value(NSVAL_ILLEGAL);
+            ns_panic(lineno) << "can't find the symbol: " << func_name << std::endl;
+            return eval_illegal;
         }
     }
-    return ns_value(NSVAL_STATUS, NSVAL_STATUS_OK);
+    return eval_status_ok;
 }
 
 
@@ -168,10 +175,10 @@ ns_value stmt_for_in_node::eval(ns_rt_context *rtctx) {
             }
         }
 
-        if (run_status) return ns_value(NSVAL_STATUS, NSVAL_STATUS_OK);
+        if (run_status) return eval_status_ok;
         
     }
-    return ns_value(NSVAL_ILLEGAL);
+    return eval_illegal;
 }
 
 ns_value operator_node::eval(ns_rt_context *rtctx) {
@@ -191,9 +198,14 @@ ns_value operator_node::eval(ns_rt_context *rtctx) {
         case '%':  n = l % r;
                    break;
         default:
-                   n = ns_value(NSVAL_ILLEGAL);
-                   fprintf(stderr, "* error *: un-defined operator: %c\n", opt);
+                   n = eval_illegal;
+                   ns_panic(lineno) << "undefined operator:" << opt << std::endl;
                    break;
+    }
+
+    if (n.is_exceptional_val()) {
+        ns_panic(lineno) << "value operation failed." 
+            << "opt:[" << opt <<"]" << std::endl;
     }
     return n;
 }
@@ -238,6 +250,11 @@ ns_value compare_node::eval(ns_rt_context *rtctx) {
             v = false; 
             break;
     }
+    
+    if (l.is_exceptional_val() || r.is_exceptional_val()) {
+        ns_panic(lineno) << "comparition operation failed." 
+            << "left: " << l << " right: " << r;
+    }
     return ns_value(v);
 }
 
@@ -249,12 +266,14 @@ ns_value stmt_list_node::eval(ns_rt_context *rtctx) {
         ns_value val = n->eval(rtctx);
         if (val.is_status_break() 
                 || val.is_status_continue()
-                || val.is_status_return()
-                || val.is_illegal_value()) {
+                || val.is_status_return()) {
             return val;
         }
+        else if (val.is_illegal_value()) {
+            ns_trace(lineno) << "eval stmt failed." << std::endl; 
+        }
     }
-    return ns_value(NSVAL_STATUS, NSVAL_STATUS_OK);
+    return eval_status_ok;
 }
 
 
@@ -264,8 +283,9 @@ ns_value array_def_node::eval(ns_rt_context *rtctx) {
     if (v.is_array()) {
         return v;
     }
-
-    return ns_value(NSVAL_ILLEGAL);
+    
+    ns_panic(lineno) << "array define eval failed" << std::endl;
+    return eval_illegal;
 }
 
 ns_value array_ref_node::eval(ns_rt_context *rtctx) {
@@ -275,18 +295,17 @@ ns_value array_ref_node::eval(ns_rt_context *rtctx) {
         if (idx.is_int()) {
             return pv.get_elem(idx.int_val);            
         }
-        std::cerr 
-            << "index is not integer type." << std::endl;
+        ns_panic(lineno) << "index is not integer type." << std::endl;
     }
-    std::cerr
-        << "the object is not iteratable" << std::endl;
-
-    return ns_value(NSVAL_ILLEGAL);
+    else {
+        ns_panic(lineno) << "the object is not iteratable" << std::endl;
+    }
+    return eval_illegal;
 }
 
 def_func_node::def_func_node(char *name, identifier_list_node *args, node *stmts)
     :node(DEF_FUNC_NODE), func_name(name), arg_list(args), stmt_list(stmts) {
-    }
+}
 
 ns_value def_func_node::eval(ns_rt_context *rtctx) {
 
@@ -313,6 +332,9 @@ ns_value stmt_return_node::eval(ns_rt_context *rtctx) {
     ns_value retval(NSVAL_STATUS, NSVAL_STATUS_RETURN);
     if (retval_exp) {
         rtctx->func_return_val = retval_exp->eval(rtctx); 
+        if (!rtctx->func_return_val.is_status_ok()) {
+            ns_trace(lineno) << "return value eval failed." << std::endl;
+        }
     }
     return retval;
 }
@@ -341,11 +363,11 @@ ns_value dot_call_method_node::eval(ns_rt_context *rtctx) {
                     arr.del(arg.int_val);
                 }
                 else {
-                    std::cerr << "paramter isn't type int!" << std::endl;
+                    ns_panic(lineno) << "paramter isn't type int!" << std::endl;
                 }
             }
             else {
-                std::cerr << "Bad paramter number!" << std::endl;
+                ns_panic(lineno) << "Bad paramter number!" << std::endl;
             }
             return arr;
         }
@@ -353,15 +375,15 @@ ns_value dot_call_method_node::eval(ns_rt_context *rtctx) {
             if (arglist.len() == 1) {
                 int idx = arr.find((*plist)[0]);
                 if (idx == -1) {
-                    std::cerr << "out of index. " << std::endl;
-                    return ns_value(NSVAL_ILLEGAL);
+                    ns_panic(lineno) << "out of index. " << std::endl;
+                    return eval_illegal;
                 }
                 return ns_value(idx);
             }
         }
         else {
-            std::cerr << "func: " << name << "doesn't support." << std::endl;
-            return ns_value(NSVAL_ILLEGAL);
+            ns_panic(lineno) << "func: " << name << "doesn't support." << std::endl;
+            return eval_illegal;
         }
     }
     else if (arr.is_raw_string()) {
@@ -370,5 +392,5 @@ ns_value dot_call_method_node::eval(ns_rt_context *rtctx) {
         }
     }
 
-    return ns_value(NSVAL_ILLEGAL);
+    return eval_illegal;
 }

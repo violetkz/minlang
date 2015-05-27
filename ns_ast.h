@@ -23,6 +23,7 @@
 #include "ns_symtbl.h"
 #include "ns_util.h"
 
+extern int yylineno;
 struct symbol;
 
 /* the base class to present AST node */
@@ -58,16 +59,17 @@ public:
         STMT_CONTINUE_NODE
     };
     
-    node(int t) : type(t) {}
+    node(int t) : type(t), lineno(yylineno) {}
     virtual ~node() {}
 
     /* eval */
     virtual ns_value eval(ns_rt_context *rtctx = NULL) {
-        return ns_value(NSVAL_STATUS, NSVAL_STATUS_OK);
+        return eval_status_ok;
     }
     
 public:
     int type;
+    int lineno;
 };
 
 class variable_node : public node {
@@ -280,12 +282,15 @@ public:
     stmt_if_node(node *condition, stmt_list_node *action) 
         : node(STMT_IF_NODE), condition_exp(condition), 
         stmts(action), else_stmts(NULL) {
+            std::cout << lineno << std::endl;
      }
 
     stmt_if_node(node *condition, stmt_list_node *action,
             stmt_list_node *else_action)
         : node(STMT_IF_NODE), condition_exp(condition),
         stmts(action), else_stmts(else_action) {
+            
+            std::cout << lineno << std::endl;
      }
     ~stmt_if_node() {
         if (condition_exp) delete condition_exp;
