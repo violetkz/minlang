@@ -34,9 +34,9 @@ then, play it. :tada:
     ```c
     main {
         i = 9;
-        while(i > 0) {
-            if ( i % 2 == 0) {
-                print (i);
+        while (i > 0) {
+            if (i % 2 == 0) {
+                print(i);
             }
             i = i - 1;
         }
@@ -53,7 +53,7 @@ then, play it. :tada:
         print(x);  ## output: 100
 
         a[1] = "ss";
-        print (a); ## output: [99,ss,88,]
+        print(a); ## output: [99,ss,88,]
     }
     ```
 
@@ -80,7 +80,7 @@ then, play it. :tada:
         if (n == 0 or n == 1) {
             return n;
         }
-        return fibonacci(n - 1)+ fibonacci(n-2);    
+        return fibonacci(n - 1) + fibonacci(n - 2);    
     }
 
     main {
@@ -99,10 +99,10 @@ then, play it. :tada:
         j = end_idx;
        
         while (i <= j) {
-            while(arr[i] < mid_val) {
+            while (arr[i] < mid_val) {
                 i = i + 1;
             }
-            while(arr[j] > mid_val) {
+            while (arr[j] > mid_val) {
                 j = j - 1;
             }
             if (i <= j) {
