@@ -10,16 +10,17 @@ and also be able to define own function.
 ## :airplane: try it.
 first, compile src code. since *minlang* depend on c++11 standard, GCC need
 be at least 4.7 or later in Linux/Cgywin/mingw platform. the version of CLang
-need be 2.9+ in MacOS
-    ```shell
-    $ make                        #for Linux/cygwin
-    $ make -f makefile.mingw      #for mingw32 
-    $ make -f makefile.mac        #for MacOS
-    ```
+need be 2.9+ in MacOS.
+```sh
+$ make                        #for Linux/cygwin
+$ make -f makefile.mingw      #for mingw32 
+$ make -f makefile.mac        #for MacOS
+```
+
 then, play it. :tada:
-    ```shell
-    $ ./minlang -f test/qsort.ns
-    ```
+```sh
+$ ./minlang -f test/qsort.ns
+```
 
 ## :zap: examples:
 
@@ -147,4 +148,4 @@ then, play it. :tada:
 * It is realy funny.:rocket:
 * For better understanding program language.:feet:
 
-*minlang* created by Flex, Bison and Cpp. 
+
